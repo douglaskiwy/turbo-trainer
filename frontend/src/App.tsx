@@ -49,6 +49,7 @@ const App = () => {
       {uploadStatus && <div style={{ color: uploadStatus.startsWith("Failed") ? "red" : "green" }}>{uploadStatus}</div>}
       {route.length > 0 && (
         <>
+          <h1 className="text-3xl font-bold mb-4">Turbo Trainer Dashboard</h1>
           <h2>Route Map</h2>
           <RouteMap points={route} nextPoint={nextPoint} distance={distance} speed={speed} />
           {nextPoint && (
@@ -78,7 +79,6 @@ const App = () => {
           )}
         </>
       )}
-      <h1 className="text-3xl font-bold mb-4">Turbo Trainer Dashboard</h1>
     </div>
   );
 }

@@ -50,15 +50,12 @@ async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
     manager.subscribe(ws)
     try:
-        last_power = 100
+        last_power = 10
         while True:
-            try:
-                data = await asyncio.wait_for(ws.receive_json(), timeout=2.0)
-                if data and "power" in data:
-                    last_power = data["power"]
-            except asyncio.TimeoutError:
-                data = None  # No message received
-
+            for device in manager.devices:
+                if isinstance(device, KickrSnapDevice) and device.latest_data and "watts" in device.latest_data:
+                    last_power = device.latest_data["watts"]
+                    break
             if route_state.exists:
                 route_state.update_progress(last_power, 1.0)
                 next_point, speed, distance = route_state.get_next_point()
@@ -75,7 +72,7 @@ async def websocket_endpoint(ws: WebSocket):
                     })
                 else:
                     await ws.send_json({"type": "route_complete"})
-            await asyncio.sleep(2)  # Simulate processing delay
+            await asyncio.sleep(1)  # Simulate processing delay
     except Exception:
         print(f"WebSocket disconnected {Exception}")
         manager.unsubscribe(ws)
