@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -55,7 +56,7 @@ async def websocket_endpoint(ws: WebSocket):
         manager.unsubscribe(ws)
 
 
-# ✅ HTTP endpoint to check current HR and power
+# HTTP endpoint to check current HR and power
 @app.get("/current")
 async def current_values():
     result = {}

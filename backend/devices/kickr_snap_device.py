@@ -1,4 +1,5 @@
 import asyncio
+import random
 from bleak import BleakClient, BleakScanner
 
 from devices.registry import register_device
@@ -37,7 +38,7 @@ class KickrSnapDevice(BaseDevice):
 
         async def power_handler(_, data: bytearray):
             watts = int.from_bytes(data[2:4], byteorder='little')
-            self.update({"type": "power", "watts": watts})
+            self.update({"type": "power", "watts": watts, "name": device.name})
 
         await self.client.start_notify(FTMS_CHARACTERISTIC_POWER, power_handler)
         print(f"Connected to Kickr {self.name}")
@@ -63,7 +64,8 @@ class KickrSnapDevice(BaseDevice):
         if self.mock:
             while self.connected:
                 power = 200
-                self.update({"type": "power", "watts": power})
+                self.update(
+                    {"type": "power", "watts": power + random.randint(-5, 5), "name": self.name})
                 await asyncio.sleep(1)
         else:
             while self.connected:

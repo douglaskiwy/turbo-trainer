@@ -1,4 +1,5 @@
 import asyncio
+import random
 from bleak import BleakClient, BleakScanner
 
 from devices.registry import register_device
@@ -45,10 +46,10 @@ class HRDevice(BaseDevice):
 
         async def _hr_handler(_, data: bytearray):
             hr_value = data[1]
-            self.update({"type": "hr", "hr": hr_value})
+            self.update({"type": "hr", "hr": hr_value, "name": device.name})
 
         await self.client.start_notify(HR_CHARACTERISTIC, _hr_handler)
-        print(f"Connected to {self.name}")
+        print(f"Connected to {device.name}")
 
     async def disconnect(self):
         if self.client and self.client.is_connected:
@@ -58,10 +59,11 @@ class HRDevice(BaseDevice):
 
     async def run(self):
         if self.mock:
-            # print("[Mock] Running HR device simulation.")
+            print("[Mock] Running HR device simulation.")
             while self.connected:
                 await asyncio.sleep(1)
-                self.update({"type": "hr", "hr": 60})
+                self.update({"type": "hr", "hr": 60 +
+                            random.randint(-5, 5), "name": self.name})
         else:
             print(f"Running HR device: {self.name}")
             while self.connected:
