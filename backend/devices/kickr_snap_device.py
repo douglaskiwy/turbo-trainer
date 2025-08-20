@@ -65,7 +65,7 @@ class KickrSnapDevice(BaseDevice):
             while self.connected:
                 power = 200
                 self.update(
-                    {"type": "power", "watts": power + random.randint(-5, 5), "name": self.name})
+                    {"type": "power", "watts": power + random.randint(-50, 50), "name": self.name})
                 await asyncio.sleep(1)
         else:
             while self.connected:

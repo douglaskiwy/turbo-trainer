@@ -1,17 +1,18 @@
 import asyncio
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
+from models.route_state import RouteState
+from models.models import RouteUpload
 from devices.manager import DeviceManager
 from devices.hr_device import HRDevice
 from devices.kickr_snap_device import KickrSnapDevice
 
-# hr = HRDevice(name="HeartRateMonitor", mock=True)
-# kickr_snap = KickrSnapDevice(name="KickrSnap", mock=True)
-
 manager = DeviceManager()
 manager.load_from_config("devices.yaml")  # Auto-load all devices
+
+route_state = RouteState()  # Store route and user state
 
 
 @asynccontextmanager
@@ -42,25 +43,63 @@ app.add_middleware(
 
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
+    """
+    WebSocket endpoint to get current HR and power values.
+    Clients can subscribe to this endpoint to receive real-time updates.
+    """
     await ws.accept()
     manager.subscribe(ws)
     try:
+        last_power = 100
         while True:
-            data = await ws.receive_json()
-            if data.get("action") == "set_power":
-                # set resistance for all devices that support it
-                for dev in manager.devices:
-                    if hasattr(dev, "set_resistance"):
-                        await dev.set_resistance(data["watts"])
+            try:
+                data = await asyncio.wait_for(ws.receive_json(), timeout=2.0)
+                if data and "power" in data:
+                    last_power = data["power"]
+            except asyncio.TimeoutError:
+                data = None  # No message received
+
+            if route_state.exists:
+                route_state.update_progress(last_power, 1.0)
+                next_point, speed, distance = route_state.get_next_point()
+                if next_point:
+                    await ws.send_json({
+                        "type": "next_point",
+                        "point": {
+                            "lat": next_point.lat,
+                            "lon": next_point.lon,
+                            "ele": next_point.ele,
+                        },
+                        "speed": speed,  # meters per second
+                        "distance": distance  # meters
+                    })
+                else:
+                    await ws.send_json({"type": "route_complete"})
+            await asyncio.sleep(2)  # Simulate processing delay
     except Exception:
+        print(f"WebSocket disconnected {Exception}")
         manager.unsubscribe(ws)
 
 
 # HTTP endpoint to check current HR and power
 @app.get("/current")
 async def current_values():
+    """
+    Test endpoint to get current values from all devices.
+    """
     result = {}
     for dev in manager.devices:
         if dev.latest_data:
             result[dev.name] = dev.latest_data
     return result
+
+
+@app.post("/route")
+async def upload_route(route: RouteUpload):
+    """
+    Upload a route with points and weight.
+    Points should be a list of dicts with 'lat', 'lon', 'ele', 'dist'.
+    """
+    route_state.set_route(route.points, route.weight)
+    print(f"Route loaded: {len(route.points)} points, weight: {route.weight}")
+    return {"status": "ok", "num_points": len(route.points), "weight": route.weight}

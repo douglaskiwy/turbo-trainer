@@ -1,6 +1,12 @@
 import { useRef, useState } from "react";
+import type { RoutePoint } from "./uploadRoute";
 
-export default function Ws() {
+
+interface WsProps {
+  onNextPoint: (point: RoutePoint, distance: number, speed: number) => void;
+}
+
+export default function Ws({ onNextPoint }: WsProps) {
     const [hr, setHr] = useState(0);
     const [power, setPower] = useState(0);
     const [connected, setConnected] = useState(false);
@@ -32,10 +38,13 @@ export default function Ws() {
         ws.onmessage = (event) :void => {
             try {
                 const msg = JSON.parse(event.data);
+                console.log("Received WebSocket message:", msg);
                 if (msg.type === "hr") {
                     setHr(msg.hr);
                 } else if (msg.type === "power") {
                     setPower(msg.watts);
+                } else if (msg.type === "next_point") {
+                    onNextPoint(msg.point, msg.distance, msg.speed);
                 }
             }
             catch (error) {
