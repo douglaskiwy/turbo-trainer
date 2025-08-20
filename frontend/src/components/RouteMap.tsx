@@ -2,13 +2,20 @@ import { MapContainer, TileLayer, Polyline, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css";
 import type { RoutePoint } from "../api/uploadRoute";
 
-export default function RouteMap({ points, nextPoint, distance, speed }: { points: RoutePoint[]; nextPoint?: RoutePoint | null; distance?: number; speed?: number }) {
+export default function RouteMap(
+  { points, nextPoint, distance, speed }: 
+  { points: RoutePoint[]; 
+    nextPoint?: RoutePoint | null; 
+    distance?: number; 
+    speed?: number }
+) {
 
   if (points.length === 0) return null;
 
   const center = [points[0].lat, points[0].lon];
   const polyline = points.map((pt) => [pt.lat, pt.lon]);
 
+  // Find progress index
   const progressIdx = nextPoint
     ? points.findIndex(
         (pt) =>
@@ -18,12 +25,25 @@ export default function RouteMap({ points, nextPoint, distance, speed }: { point
       )
     : -1;
 
+   // Split route into covered and remaining
+  const covered = progressIdx >= 0 ? points.slice(0, progressIdx + 1) : [];
+  const remaining = progressIdx >= 0 ? points.slice(progressIdx) : points;
+
   return (
-    <MapContainer center={center} zoom={13} style={{ height: "400px", width: "100%" }}>
+    <MapContainer center={[points[0].lat, points[0].lon]} zoom={13} style={{ height: "400px", width: "100%" }}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Polyline positions={polyline} color="blue" />
+      {/* Covered distance in red */}
+      {covered.length > 1 && (
+        <Polyline positions={covered.map(pt => [pt.lat, pt.lon])} color="red" />
+      )}
+      {/* Remaining route in blue */}
+      {remaining.length > 1 && (
+        <Polyline positions={remaining.map(pt => [pt.lat, pt.lon])} color="blue" />
+      )}
+      {/* Current position marker */}
       {nextPoint && (
         <Marker position={[nextPoint.lat, nextPoint.lon]}>
           <Popup>
