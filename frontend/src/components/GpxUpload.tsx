@@ -45,15 +45,33 @@ export default function GpxUpload({ onRouteParsed }: { onRouteParsed: (route: an
       })) || [];
       onRouteParsed(points);
     } catch (err) {
-      setError(`Failed to parse GPX file. $}{}`);
+      setError(`Failed to parse GPX file. ${err}`);
     }
   };
 
   return (
-    <div>
-      <input type="file" accept=".gpx" onChange={handleFileChange} />
-      <button onClick={handleUpload} disabled={!file}>Upload & Parse GPX</button>
-      {error && <div style={{ color: "red" }}>{error}</div>}
+     <div className="flex flex-col items-start gap-2 p-4 bg-white rounded shadow">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Upload GPX File
+      </label>
+      <input
+        type="file"
+        accept=".gpx"
+        onChange={handleFileChange}
+        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        onClick={handleUpload}
+        disabled={!file}
+        className={`mt-2 px-4 py-2 rounded font-semibold transition
+          ${file
+            ? "bg-blue-600 text-white hover:bg-blue-700"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"}
+        `}
+      >
+        Upload & Parse GPX
+      </button>
+      {error && <div className="mt-2 text-red-600">{error}</div>}
     </div>
   );
 }

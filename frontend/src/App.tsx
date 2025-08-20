@@ -39,7 +39,8 @@ const App = () => {
 
   return (
     <div>
-      <h1>GPX Route Upload</h1>
+      <h1 className="text-3xl font-bold mb-4">Turbo Trainer Dashboard</h1>
+      <h3>GPX Route Upload</h3>
       <Ws onNextPoint={(point, distance, speed) => {
         setNextPoint(point);
         setDistance(distance);
@@ -49,7 +50,6 @@ const App = () => {
       {uploadStatus && <div style={{ color: uploadStatus.startsWith("Failed") ? "red" : "green" }}>{uploadStatus}</div>}
       {route.length > 0 && (
         <>
-          <h1 className="text-3xl font-bold mb-4">Turbo Trainer Dashboard</h1>
           <h2>Route Map</h2>
           <RouteMap points={route} nextPoint={nextPoint} distance={distance} speed={speed} />
           {nextPoint && (
