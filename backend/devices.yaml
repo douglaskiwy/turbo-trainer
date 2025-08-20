@@ -1,0 +1,7 @@
+devices:
+  - type: HRDevice
+    name: fenix
+    mock: true
+  - type: KickrSnapDevice
+    name: Kickr
+    mock: true
