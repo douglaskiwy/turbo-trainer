@@ -26,14 +26,20 @@ class KickrSnapDevice(BaseDevice):
             return
 
         print(f"Looking for Kickr Snap device: {self.name}")
-        device = await BleakScanner.find_device_by_name(
-            lambda d, _: self.name.lower() in d.name.lower()
-        )
-        if device is None:
+        devices = await BleakScanner.discover()
+
+        for id, device in enumerate(devices):
+            print(f"Found device: {device.name}")
+            if device.name and self.name.lower() in device.name.lower():
+                found_device = True
+                print(f"Found KICKR device: {device.name}")
+                break
+        if found_device is None:
             raise RuntimeError(f"Device {self.name} not found.")
 
-        self.client = BleakClient(device)
-        await self.client.connect()
+        print(f"Connecting to device: {device.name} {device.address}")
+        self.client = BleakClient(device.address)
+        await self.client.connect(timeout=20)
         self.connected = True
 
         async def power_handler(_, data: bytearray):

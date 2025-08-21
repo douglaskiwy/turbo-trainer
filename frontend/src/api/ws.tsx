@@ -27,7 +27,7 @@ export default function Ws({ onNextPoint }: WsProps) {
     }
 
     const connectWS = () => {
-        const ws = new WebSocket("ws://localhost:8000/ws");
+        const ws = new WebSocket("ws://127.0.0.1:8000/ws");
         wsRef.current = ws;
 
         ws.onopen = () :void => {
@@ -38,7 +38,7 @@ export default function Ws({ onNextPoint }: WsProps) {
         ws.onmessage = (event) :void => {
             try {
                 const msg = JSON.parse(event.data);
-                console.log("Received WebSocket message:", msg);
+                // console.log("Received WebSocket message:", msg);
                 if (msg.type === "hr") {
                     setHr(msg.hr);
                 } else if (msg.type === "power") {

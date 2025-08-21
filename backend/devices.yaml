@@ -3,5 +3,5 @@ devices:
     name: fenix
     mock: true
   - type: KickrSnapDevice
-    name: Kickr
+    name: KICKR
     mock: true

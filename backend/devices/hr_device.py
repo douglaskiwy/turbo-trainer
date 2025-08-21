@@ -41,7 +41,7 @@ class HRDevice(BaseDevice):
             raise RuntimeError(f"Device {self.name} not found.")
 
         self.client = BleakClient(device.address)
-        await self.client.connect()
+        await self.client.connect(timeout=10)
         self.connected = True
 
         async def _hr_handler(_, data: bytearray):
