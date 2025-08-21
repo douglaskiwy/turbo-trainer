@@ -1,7 +1,7 @@
 DEVICE_REGISTRY = {}
 
 
-def register_device(cls):
+def register_device(cls) -> type:
     """
     Decorator to register a device class in the DEVICE_REGISTRY.
     """

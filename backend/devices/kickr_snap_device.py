@@ -14,6 +14,10 @@ FTMS_CHARACTERISTIC_CONTROL = "00002ad9-0000-1000-8000-00805f9b34fb"  # control 
 
 @register_device
 class KickrSnapDevice(BaseDevice):
+    """
+    Represents a KICKR Snap smart trainer device.
+    """
+
     def __init__(self, name: str, mock: bool = True):
         super().__init__(name, mock)
         self.client = None

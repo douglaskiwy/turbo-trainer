@@ -2,7 +2,10 @@ import math
 from models.models import RoutePoint
 
 
-def haversine(pt1, pt2):
+def haversine(pt1, pt2) -> float:
+    """
+    Calculate the great-circle distance between two points on the Earth surface.
+    """
     R = 6371000  # Earth radius in meters
     lat1, lon1 = math.radians(pt1.lat), math.radians(pt1.lon)
     lat2, lon2 = math.radians(pt2.lat), math.radians(pt2.lon)
@@ -22,6 +25,9 @@ def calculate_resistance(
     cda: float = 0.4,
     air_density: float = 1.225
 ) -> float:
+    """
+    Calculate the resistance between two points.
+    """
     # Gravity
     elevation_gain = curr.ele - prev.ele
     distance = haversine(prev, curr)  # in meters

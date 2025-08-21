@@ -31,7 +31,7 @@ const App = () => {
     setUploadStatus(null);
     try {
       const res = await uploadRoute(points, weight);
-      setUploadStatus(`Route uploaded! Points: ${res.num_points}, Weight: ${res.weight}`);
+      setUploadStatus(`Route uploaded! Points: ${res.num_points}`);
     } catch (err: unknown) {
       setUploadStatus(`Failed to upload route. Error:${String(err)}`);
     }

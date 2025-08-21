@@ -6,6 +6,9 @@ from devices.registry import DEVICE_REGISTRY
 
 
 class DeviceManager:
+    """
+    Singleton class to manage devices.
+    """
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -20,6 +23,9 @@ class DeviceManager:
             self._started = False
 
     def load_from_config(self, path="devices.yaml"):
+        """
+        Load device configuration from a YAML file.
+        """
         cfg = yaml.safe_load(Path(path).read_text())
 
         for dev_cfg in cfg.get("devices", []):

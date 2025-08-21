@@ -1,9 +1,10 @@
-import asyncio
 from typing import Optional, Callable
 
 
 class BaseDevice:
-    """Abstract base for all BLE devices."""
+    """
+    Abstract base for all BLE devices.
+    """
 
     def __init__(self, name: str, mock: bool = True):
         self.name = name

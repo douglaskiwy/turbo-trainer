@@ -9,18 +9,18 @@ from devices.manager import DeviceManager
 from devices.hr_device import HRDevice
 from devices.kickr_snap_device import KickrSnapDevice
 
-manager = DeviceManager()
-manager.load_from_config("devices.yaml")  # Auto-load all devices
-
 route_state = RouteState()  # Store route and user state
+manager = DeviceManager()  # Singleton instance to store device connections
+manager.load_from_config("devices.yaml")  # Auto-load all devices
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    """
+    Application lifespan events.
+    """
     await manager.start()
     yield
-    # Shutdown
     await manager.stop()
 
 app = FastAPI(lifespan=lifespan)
@@ -50,7 +50,8 @@ async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
     manager.subscribe(ws)
     try:
-        last_power = 10
+        # set last power to avoid any calculations using 0
+        last_power = 1
         while True:
             for device in manager.devices:
                 if isinstance(device, KickrSnapDevice) and device.latest_data and "watts" in device.latest_data:

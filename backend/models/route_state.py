@@ -5,6 +5,9 @@ from models.simple_resistance import calculate_resistance
 
 class RouteState:
     def __init__(self):
+        """
+        Initialize the route state.
+        """
         self.points = []
         self.weight = 90.0
         self.current_idx = 0
@@ -12,7 +15,10 @@ class RouteState:
         self.distance_covered = 0.0
         self.exists = False
 
-    def set_route(self, points, weight):
+    def set_route(self, points, weight) -> None:
+        """
+        Set the route points and weight.
+        """
         self.points = points
         self.weight = weight
         self.speed = 0.0
@@ -20,7 +26,10 @@ class RouteState:
         self.distance_covered = 0.0
         self.exists = True
 
-    def update_progress(self, watts, dt):
+    def update_progress(self, watts, dt) -> None:
+        """
+        Update the progress of the route.
+        """
         if not self.exists or self.current_idx == len(self.points)-1:
             return
 
@@ -40,7 +49,10 @@ class RouteState:
             self.current_idx += 1
             self.distance_covered = 0.0
 
-    def get_next_point(self):
+    def get_next_point(self) -> Optional[tuple]:
+        """
+        Get the next route point along with the current speed and distance covered.
+        """
         if not self.exists:
             return None
         return (self.points[self.current_idx], self.speed, self.distance_covered)
